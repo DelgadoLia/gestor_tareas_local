@@ -21,12 +21,12 @@ class AppDatabase extends _$AppDatabase {
         closeStreamsSynchronously: true,  // clave para pruebas de widget
       ));
 
-  // Crear
+// Crear
 Future<int> agregarTarea(String titulo) {
   return into(tareas).insert(TareasCompanion.insert(titulo: titulo));
 }
 
-// Consultar (reactivo)
+// Consultar reactivamente
 Stream<List<TareaRegistro>> observarTareas() {
   return select(tareas).watch();
 }
@@ -34,6 +34,23 @@ Stream<List<TareaRegistro>> observarTareas() {
 // Consultar una vez (útil para pruebas)
 Future<List<TareaRegistro>> obtenerTareas() {
   return select(tareas).get();
+}
+
+// Actualizar título
+Future<int> actualizarTitulo(int id, String nuevoTitulo) {
+  return (update(tareas)..where((t) => t.id.equals(id)))
+      .write(TareasCompanion(titulo: Value(nuevoTitulo)));
+}
+
+// Alternar completada
+Future<int> alternarCompletada(int id, bool completada) {
+  return (update(tareas)..where((t) => t.id.equals(id)))
+      .write(TareasCompanion(completada: Value(completada)));
+}
+
+// Eliminar
+Future<int> eliminarTarea(int id) {
+  return (delete(tareas)..where((t) => t.id.equals(id))).go();
 }
 
   @override
