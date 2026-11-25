@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
+import 'package:drift/native.dart';
 
 part 'database.g.dart';
 
@@ -14,6 +15,26 @@ class Tareas extends Table {
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
   AppDatabase.abrir() : super(_abrirConexion());
+  AppDatabase.enMemoria()
+    : super(DatabaseConnection(
+        NativeDatabase.memory(),
+        closeStreamsSynchronously: true,  // clave para pruebas de widget
+      ));
+
+  // Crear
+Future<int> agregarTarea(String titulo) {
+  return into(tareas).insert(TareasCompanion.insert(titulo: titulo));
+}
+
+// Consultar (reactivo)
+Stream<List<TareaRegistro>> observarTareas() {
+  return select(tareas).watch();
+}
+
+// Consultar una vez (útil para pruebas)
+Future<List<TareaRegistro>> obtenerTareas() {
+  return select(tareas).get();
+}
 
   @override
   int get schemaVersion => 1;
@@ -28,3 +49,4 @@ QueryExecutor _abrirConexion() {
     ),
   );
 }
+
